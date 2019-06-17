@@ -16,12 +16,14 @@
 
 package sample.data.elasticsearch;
 
-import org.elasticsearch.client.transport.NoNodeAvailableException;
+import java.net.ConnectException;
+
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import org.springframework.boot.builder.SpringApplicationBuilder;
-import org.springframework.boot.test.extension.OutputCapture;
+import org.springframework.boot.test.system.CapturedOutput;
+import org.springframework.boot.test.system.OutputCaptureExtension;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -30,13 +32,11 @@ import static org.assertj.core.api.Assertions.assertThat;
  *
  * @author Artur Konczak
  */
+@ExtendWith(OutputCaptureExtension.class)
 class SampleElasticsearchApplicationTests {
 
-	@RegisterExtension
-	OutputCapture output = new OutputCapture();
-
 	@Test
-	void testDefaultSettings() {
+	void testDefaultSettings(CapturedOutput capturedOutput) {
 		try {
 			new SpringApplicationBuilder(SampleElasticsearchApplication.class).run();
 		}
@@ -46,13 +46,13 @@ class SampleElasticsearchApplicationTests {
 			}
 			throw ex;
 		}
-		assertThat(this.output).contains("firstName='Alice', lastName='Smith'");
+		assertThat(capturedOutput).contains("firstName='Alice', lastName='Smith'");
 	}
 
 	private boolean elasticsearchRunning(Exception ex) {
 		Throwable candidate = ex;
 		while (candidate != null) {
-			if (candidate instanceof NoNodeAvailableException) {
+			if (candidate instanceof ConnectException) {
 				return false;
 			}
 			candidate = candidate.getCause();

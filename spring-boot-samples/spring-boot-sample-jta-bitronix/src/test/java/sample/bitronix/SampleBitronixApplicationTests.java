@@ -19,10 +19,11 @@ package sample.bitronix;
 import bitronix.tm.resource.jms.PoolingConnectionFactory;
 import org.assertj.core.api.Condition;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.test.extension.OutputCapture;
+import org.springframework.boot.test.system.CapturedOutput;
+import org.springframework.boot.test.system.OutputCaptureExtension;
 import org.springframework.context.ApplicationContext;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -32,36 +33,29 @@ import static org.assertj.core.api.Assertions.assertThat;
  *
  * @author Phillip Webb
  */
+@ExtendWith(OutputCaptureExtension.class)
 class SampleBitronixApplicationTests {
 
-	@RegisterExtension
-	OutputCapture output = new OutputCapture();
-
 	@Test
-	void testTransactionRollback() throws Exception {
+	void testTransactionRollback(CapturedOutput capturedOutput) throws Exception {
 		SampleBitronixApplication.main(new String[] {});
-		assertThat(this.output.toString()).has(substring(1, "---->"));
-		assertThat(this.output.toString()).has(substring(1, "----> josh"));
-		assertThat(this.output.toString()).has(substring(2, "Count is 1"));
-		assertThat(this.output.toString()).has(substring(1, "Simulated error"));
+		assertThat(capturedOutput.toString()).has(substring(1, "---->")).has(substring(1, "----> josh"))
+				.has(substring(2, "Count is 1")).has(substring(1, "Simulated error"));
 	}
 
 	@Test
 	void testExposesXaAndNonXa() {
-		ApplicationContext context = SpringApplication
-				.run(SampleBitronixApplication.class);
+		ApplicationContext context = SpringApplication.run(SampleBitronixApplication.class);
 		Object jmsConnectionFactory = context.getBean("jmsConnectionFactory");
 		Object xaJmsConnectionFactory = context.getBean("xaJmsConnectionFactory");
 		Object nonXaJmsConnectionFactory = context.getBean("nonXaJmsConnectionFactory");
 		assertThat(jmsConnectionFactory).isSameAs(xaJmsConnectionFactory);
 		assertThat(jmsConnectionFactory).isInstanceOf(PoolingConnectionFactory.class);
-		assertThat(nonXaJmsConnectionFactory)
-				.isNotInstanceOf(PoolingConnectionFactory.class);
+		assertThat(nonXaJmsConnectionFactory).isNotInstanceOf(PoolingConnectionFactory.class);
 	}
 
 	private Condition<String> substring(int times, String substring) {
-		return new Condition<String>(
-				"containing '" + substring + "' " + times + " times") {
+		return new Condition<String>("containing '" + substring + "' " + times + " times") {
 
 			@Override
 			public boolean matches(String value) {

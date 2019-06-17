@@ -29,7 +29,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  *
  * @author Phillip Webb
  */
-public class MockitoContextCustomizerFactoryTests {
+class MockitoContextCustomizerFactoryTests {
 
 	private final MockitoContextCustomizerFactory factory = new MockitoContextCustomizerFactory();
 
@@ -39,29 +39,24 @@ public class MockitoContextCustomizerFactoryTests {
 	}
 
 	@Test
-	public void getContextCustomizerWithoutAnnotationReturnsCustomizer() {
-		ContextCustomizer customizer = this.factory
-				.createContextCustomizer(NoMockBeanAnnotation.class, null);
+	void getContextCustomizerWithoutAnnotationReturnsCustomizer() {
+		ContextCustomizer customizer = this.factory.createContextCustomizer(NoMockBeanAnnotation.class, null);
 		assertThat(customizer).isNotNull();
 	}
 
 	@Test
-	public void getContextCustomizerWithAnnotationReturnsCustomizer() {
-		ContextCustomizer customizer = this.factory
-				.createContextCustomizer(WithMockBeanAnnotation.class, null);
+	void getContextCustomizerWithAnnotationReturnsCustomizer() {
+		ContextCustomizer customizer = this.factory.createContextCustomizer(WithMockBeanAnnotation.class, null);
 		assertThat(customizer).isNotNull();
 	}
 
 	@Test
-	public void getContextCustomizerUsesMocksAsCacheKey() {
-		ContextCustomizer customizer = this.factory
-				.createContextCustomizer(WithMockBeanAnnotation.class, null);
+	void getContextCustomizerUsesMocksAsCacheKey() {
+		ContextCustomizer customizer = this.factory.createContextCustomizer(WithMockBeanAnnotation.class, null);
 		assertThat(customizer).isNotNull();
-		ContextCustomizer same = this.factory
-				.createContextCustomizer(WithSameMockBeanAnnotation.class, null);
+		ContextCustomizer same = this.factory.createContextCustomizer(WithSameMockBeanAnnotation.class, null);
 		assertThat(customizer).isNotNull();
-		ContextCustomizer different = this.factory
-				.createContextCustomizer(WithDifferentMockBeanAnnotation.class, null);
+		ContextCustomizer different = this.factory.createContextCustomizer(WithDifferentMockBeanAnnotation.class, null);
 		assertThat(different).isNotNull();
 		assertThat(customizer.hashCode()).isEqualTo(same.hashCode());
 		assertThat(customizer.hashCode()).isNotEqualTo(different.hashCode());

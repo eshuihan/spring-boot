@@ -31,7 +31,7 @@ import static org.mockito.Mockito.mock;
  *
  * @author Brian Clozel
  */
-public class MetricsWebClientCustomizerTests {
+class MetricsWebClientCustomizerTests {
 
 	private MetricsWebClientCustomizer customizer;
 
@@ -45,20 +45,20 @@ public class MetricsWebClientCustomizerTests {
 	}
 
 	@Test
-	public void customizeShouldAddFilterFunction() {
+	void customizeShouldAddFilterFunction() {
 		this.clientBuilder.filter(mock(ExchangeFilterFunction.class));
 		this.customizer.customize(this.clientBuilder);
-		this.clientBuilder.filters((filters) -> assertThat(filters).hasSize(2).first()
-				.isInstanceOf(MetricsWebClientFilterFunction.class));
+		this.clientBuilder.filters(
+				(filters) -> assertThat(filters).hasSize(2).first().isInstanceOf(MetricsWebClientFilterFunction.class));
 	}
 
 	@Test
-	public void customizeShouldNotAddDuplicateFilterFunction() {
+	void customizeShouldNotAddDuplicateFilterFunction() {
 		this.customizer.customize(this.clientBuilder);
 		this.clientBuilder.filters((filters) -> assertThat(filters).hasSize(1));
 		this.customizer.customize(this.clientBuilder);
-		this.clientBuilder.filters((filters) -> assertThat(filters).hasSize(1).first()
-				.isInstanceOf(MetricsWebClientFilterFunction.class));
+		this.clientBuilder.filters(
+				(filters) -> assertThat(filters).hasSize(1).first().isInstanceOf(MetricsWebClientFilterFunction.class));
 	}
 
 }

@@ -33,7 +33,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  *
  * @author Stephane Nicoll
  */
-public class ResourceConditionTests {
+class ResourceConditionTests {
 
 	private ConfigurableApplicationContext context;
 
@@ -45,21 +45,20 @@ public class ResourceConditionTests {
 	}
 
 	@Test
-	public void defaultResourceAndNoExplicitKey() {
+	void defaultResourceAndNoExplicitKey() {
 		load(DefaultLocationConfiguration.class);
 		assertThat(this.context.containsBean("foo")).isTrue();
 	}
 
 	@Test
-	public void unknownDefaultLocationAndNoExplicitKey() {
+	void unknownDefaultLocationAndNoExplicitKey() {
 		load(UnknownDefaultLocationConfiguration.class);
 		assertThat(this.context.containsBean("foo")).isFalse();
 	}
 
 	@Test
-	public void unknownDefaultLocationAndExplicitKeyToResource() {
-		load(UnknownDefaultLocationConfiguration.class,
-				"spring.foo.test.config=logging.properties");
+	void unknownDefaultLocationAndExplicitKeyToResource() {
+		load(UnknownDefaultLocationConfiguration.class, "spring.foo.test.config=logging.properties");
 		assertThat(this.context.containsBean("foo")).isTrue();
 	}
 
@@ -101,12 +100,10 @@ public class ResourceConditionTests {
 
 	}
 
-	private static class UnknownDefaultLocationResourceCondition
-			extends ResourceCondition {
+	private static class UnknownDefaultLocationResourceCondition extends ResourceCondition {
 
 		UnknownDefaultLocationResourceCondition() {
-			super("test", "spring.foo.test.config",
-					"classpath:/this-file-does-not-exist.xml");
+			super("test", "spring.foo.test.config", "classpath:/this-file-does-not-exist.xml");
 		}
 
 	}

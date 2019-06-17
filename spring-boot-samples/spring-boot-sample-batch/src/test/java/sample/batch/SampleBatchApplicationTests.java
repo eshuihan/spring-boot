@@ -17,23 +17,21 @@
 package sample.batch;
 
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.test.extension.OutputCapture;
+import org.springframework.boot.test.system.CapturedOutput;
+import org.springframework.boot.test.system.OutputCaptureExtension;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@ExtendWith(OutputCaptureExtension.class)
 class SampleBatchApplicationTests {
 
-	@RegisterExtension
-	OutputCapture output = new OutputCapture();
-
 	@Test
-	void testDefaultSettings() {
-		assertThat(SpringApplication
-				.exit(SpringApplication.run(SampleBatchApplication.class))).isEqualTo(0);
-		assertThat(this.output).contains("completed with the following parameters");
+	void testDefaultSettings(CapturedOutput capturedOutput) {
+		assertThat(SpringApplication.exit(SpringApplication.run(SampleBatchApplication.class))).isEqualTo(0);
+		assertThat(capturedOutput).contains("completed with the following parameters");
 	}
 
 }

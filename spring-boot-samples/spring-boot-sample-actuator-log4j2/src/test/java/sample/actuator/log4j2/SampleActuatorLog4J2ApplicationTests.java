@@ -21,12 +21,13 @@ import java.util.Base64;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.extension.OutputCapture;
+import org.springframework.boot.test.system.CapturedOutput;
+import org.springframework.boot.test.system.OutputCaptureExtension;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -43,31 +44,25 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  */
 @SpringBootTest
 @AutoConfigureMockMvc
+@ExtendWith(OutputCaptureExtension.class)
 class SampleActuatorLog4J2ApplicationTests {
 
-	private static final Logger logger = LogManager
-			.getLogger(SampleActuatorLog4J2ApplicationTests.class);
-
-	@RegisterExtension
-	OutputCapture output = new OutputCapture();
+	private static final Logger logger = LogManager.getLogger(SampleActuatorLog4J2ApplicationTests.class);
 
 	@Autowired
 	private MockMvc mvc;
 
 	@Test
-	void testLogger() {
+	void testLogger(CapturedOutput capturedOutput) {
 		logger.info("Hello World");
-		assertThat(this.output).contains("Hello World");
+		assertThat(capturedOutput).contains("Hello World");
 	}
 
 	@Test
 	void validateLoggersEndpoint() throws Exception {
-		this.mvc.perform(
-				get("/actuator/loggers/org.apache.coyote.http11.Http11NioProtocol")
-						.header("Authorization", "Basic " + getBasicAuth()))
-				.andExpect(status().isOk())
-				.andExpect(content().string(equalTo("{\"configuredLevel\":\"WARN\","
-						+ "\"effectiveLevel\":\"WARN\"}")));
+		this.mvc.perform(get("/actuator/loggers/org.apache.coyote.http11.Http11NioProtocol").header("Authorization",
+				"Basic " + getBasicAuth())).andExpect(status().isOk()).andExpect(
+						content().string(equalTo("{\"configuredLevel\":\"WARN\"," + "\"effectiveLevel\":\"WARN\"}")));
 	}
 
 	private String getBasicAuth() {

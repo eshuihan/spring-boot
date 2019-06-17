@@ -19,20 +19,19 @@ package sample.liquibase;
 import java.net.ConnectException;
 
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.api.extension.ExtendWith;
 
-import org.springframework.boot.test.extension.OutputCapture;
+import org.springframework.boot.test.system.CapturedOutput;
+import org.springframework.boot.test.system.OutputCaptureExtension;
 import org.springframework.core.NestedCheckedException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@ExtendWith(OutputCaptureExtension.class)
 class SampleLiquibaseApplicationTests {
 
-	@RegisterExtension
-	OutputCapture output = new OutputCapture();
-
 	@Test
-	void testDefaultSettings() throws Exception {
+	void testDefaultSettings(CapturedOutput capturedOutput) throws Exception {
 		try {
 			SampleLiquibaseApplication.main(new String[] { "--server.port=0" });
 		}
@@ -41,17 +40,13 @@ class SampleLiquibaseApplicationTests {
 				return;
 			}
 		}
-		assertThat(this.output).contains("Successfully acquired change log lock")
-				.contains("Creating database history "
-						+ "table with name: PUBLIC.DATABASECHANGELOG")
+		assertThat(capturedOutput).contains("Successfully acquired change log lock")
+				.contains("Creating database history " + "table with name: PUBLIC.DATABASECHANGELOG")
 				.contains("Table person created")
-				.contains("ChangeSet classpath:/db/"
-						+ "changelog/db.changelog-master.yaml::1::"
+				.contains("ChangeSet classpath:/db/" + "changelog/db.changelog-master.yaml::1::"
 						+ "marceloverdijk ran successfully")
-				.contains("New row inserted into person")
-				.contains("ChangeSet classpath:/db/changelog/"
-						+ "db.changelog-master.yaml::2::"
-						+ "marceloverdijk ran successfully")
+				.contains("New row inserted into person").contains("ChangeSet classpath:/db/changelog/"
+						+ "db.changelog-master.yaml::2::" + "marceloverdijk ran successfully")
 				.contains("Successfully released change log lock");
 	}
 

@@ -32,7 +32,7 @@ import static org.mockito.Mockito.verify;
  *
  * @author Brian Clozel
  */
-public class NettyWebServerFactoryCustomizerTests {
+class NettyWebServerFactoryCustomizerTests {
 
 	private MockEnvironment environment;
 
@@ -45,12 +45,11 @@ public class NettyWebServerFactoryCustomizerTests {
 		this.environment = new MockEnvironment();
 		this.serverProperties = new ServerProperties();
 		ConfigurationPropertySources.attach(this.environment);
-		this.customizer = new NettyWebServerFactoryCustomizer(this.environment,
-				this.serverProperties);
+		this.customizer = new NettyWebServerFactoryCustomizer(this.environment, this.serverProperties);
 	}
 
 	@Test
-	public void deduceUseForwardHeaders() {
+	void deduceUseForwardHeaders() {
 		this.environment.setProperty("DYNO", "-");
 		NettyReactiveWebServerFactory factory = mock(NettyReactiveWebServerFactory.class);
 		this.customizer.customize(factory);
@@ -58,14 +57,14 @@ public class NettyWebServerFactoryCustomizerTests {
 	}
 
 	@Test
-	public void defaultUseForwardHeaders() {
+	void defaultUseForwardHeaders() {
 		NettyReactiveWebServerFactory factory = mock(NettyReactiveWebServerFactory.class);
 		this.customizer.customize(factory);
 		verify(factory).setUseForwardHeaders(false);
 	}
 
 	@Test
-	public void setUseForwardHeaders() {
+	void setUseForwardHeaders() {
 		this.serverProperties.setUseForwardHeaders(true);
 		NettyReactiveWebServerFactory factory = mock(NettyReactiveWebServerFactory.class);
 		this.customizer.customize(factory);

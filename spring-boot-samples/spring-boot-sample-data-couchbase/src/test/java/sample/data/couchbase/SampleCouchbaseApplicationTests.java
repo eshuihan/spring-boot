@@ -18,31 +18,29 @@ package sample.data.couchbase;
 import java.net.ConnectException;
 
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import org.springframework.boot.builder.SpringApplicationBuilder;
-import org.springframework.boot.test.extension.OutputCapture;
+import org.springframework.boot.test.system.CapturedOutput;
+import org.springframework.boot.test.system.OutputCaptureExtension;
 import org.springframework.core.NestedCheckedException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@ExtendWith(OutputCaptureExtension.class)
 class SampleCouchbaseApplicationTests {
 
-	@RegisterExtension
-	OutputCapture output = new OutputCapture();
-
 	@Test
-	void testDefaultSettings() {
+	void testDefaultSettings(CapturedOutput capturedOutput) {
 		try {
-			new SpringApplicationBuilder(SampleCouchbaseApplication.class)
-					.run("--server.port=0");
+			new SpringApplicationBuilder(SampleCouchbaseApplication.class).run("--server.port=0");
 		}
 		catch (RuntimeException ex) {
 			if (serverNotRunning(ex)) {
 				return;
 			}
 		}
-		assertThat(this.output).contains("firstName='Alice', lastName='Smith'");
+		assertThat(capturedOutput).contains("firstName='Alice', lastName='Smith'");
 	}
 
 	private boolean serverNotRunning(RuntimeException ex) {

@@ -37,7 +37,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  *
  * @author Andy Wilkinson
  */
-public class WebSocketServletAutoConfigurationTests {
+class WebSocketServletAutoConfigurationTests {
 
 	private AnnotationConfigServletWebServerApplicationContext context;
 
@@ -54,19 +54,18 @@ public class WebSocketServletAutoConfigurationTests {
 	}
 
 	@Test
-	public void tomcatServerContainerIsAvailableFromTheServletContext() {
+	void tomcatServerContainerIsAvailableFromTheServletContext() {
 		serverContainerIsAvailableFromTheServletContext(TomcatConfiguration.class,
 				WebSocketServletAutoConfiguration.TomcatWebSocketConfiguration.class);
 	}
 
 	@Test
-	public void jettyServerContainerIsAvailableFromTheServletContext() {
+	void jettyServerContainerIsAvailableFromTheServletContext() {
 		serverContainerIsAvailableFromTheServletContext(JettyConfiguration.class,
 				WebSocketServletAutoConfiguration.JettyWebSocketConfiguration.class);
 	}
 
-	private void serverContainerIsAvailableFromTheServletContext(
-			Class<?>... configuration) {
+	private void serverContainerIsAvailableFromTheServletContext(Class<?>... configuration) {
 		this.context.register(configuration);
 		this.context.refresh();
 		Object serverContainer = this.context.getServletContext()

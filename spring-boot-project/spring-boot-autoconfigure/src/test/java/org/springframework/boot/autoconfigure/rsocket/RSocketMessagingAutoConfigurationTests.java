@@ -16,7 +16,7 @@
 
 package org.springframework.boot.autoconfigure.rsocket;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
@@ -26,6 +26,7 @@ import org.springframework.core.codec.CharSequenceEncoder;
 import org.springframework.core.codec.StringDecoder;
 import org.springframework.messaging.rsocket.MessageHandlerAcceptor;
 import org.springframework.messaging.rsocket.RSocketStrategies;
+import org.springframework.web.util.pattern.PathPatternRouteMatcher;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -34,60 +35,56 @@ import static org.assertj.core.api.Assertions.assertThat;
  *
  * @author Brian Clozel
  */
-public class RSocketMessagingAutoConfigurationTests {
+class RSocketMessagingAutoConfigurationTests {
 
-	private ApplicationContextRunner contextRunner = new ApplicationContextRunner()
-			.withConfiguration(
-					AutoConfigurations.of(RSocketMessagingAutoConfiguration.class))
+	private final ApplicationContextRunner contextRunner = new ApplicationContextRunner()
+			.withConfiguration(AutoConfigurations.of(RSocketMessagingAutoConfiguration.class))
 			.withUserConfiguration(BaseConfiguration.class);
 
 	@Test
-	public void shouldCreateDefaultBeans() {
-		this.contextRunner.run((context) -> assertThat(context)
-				.getBeans(MessageHandlerAcceptor.class).hasSize(1));
+	void shouldCreateDefaultBeans() {
+		this.contextRunner.run((context) -> {
+			assertThat(context).getBeans(MessageHandlerAcceptor.class).hasSize(1);
+			assertThat(context.getBean(MessageHandlerAcceptor.class).getRouteMatcher())
+					.isInstanceOf(PathPatternRouteMatcher.class);
+		});
 	}
 
 	@Test
-	public void shouldFailOnMissingStrategies() {
-		new ApplicationContextRunner()
-				.withConfiguration(
-						AutoConfigurations.of(RSocketMessagingAutoConfiguration.class))
+	void shouldFailOnMissingStrategies() {
+		new ApplicationContextRunner().withConfiguration(AutoConfigurations.of(RSocketMessagingAutoConfiguration.class))
 				.run((context) -> {
 					assertThat(context).hasFailed();
-					assertThat(context.getStartupFailure().getMessage())
-							.contains("No qualifying bean of type "
-									+ "'org.springframework.messaging.rsocket.RSocketStrategies' available");
+					assertThat(context.getStartupFailure().getMessage()).contains("No qualifying bean of type "
+							+ "'org.springframework.messaging.rsocket.RSocketStrategies' available");
 				});
 	}
 
 	@Test
-	public void shouldUseCustomMessageHandlerAcceptor() {
+	void shouldUseCustomMessageHandlerAcceptor() {
 		this.contextRunner.withUserConfiguration(CustomMessageHandlerAcceptor.class)
-				.run((context) -> assertThat(context)
-						.getBeanNames(MessageHandlerAcceptor.class)
+				.run((context) -> assertThat(context).getBeanNames(MessageHandlerAcceptor.class)
 						.containsOnly("customMessageHandlerAcceptor"));
 	}
 
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
 	static class BaseConfiguration {
 
 		@Bean
 		public RSocketStrategies rSocketStrategies() {
-			return RSocketStrategies.builder()
-					.encoder(CharSequenceEncoder.textPlainOnly())
+			return RSocketStrategies.builder().encoder(CharSequenceEncoder.textPlainOnly())
 					.decoder(StringDecoder.textPlainOnly()).build();
 		}
 
 	}
 
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
 	static class CustomMessageHandlerAcceptor {
 
 		@Bean
 		public MessageHandlerAcceptor customMessageHandlerAcceptor() {
 			MessageHandlerAcceptor acceptor = new MessageHandlerAcceptor();
-			RSocketStrategies strategies = RSocketStrategies.builder()
-					.encoder(CharSequenceEncoder.textPlainOnly())
+			RSocketStrategies strategies = RSocketStrategies.builder().encoder(CharSequenceEncoder.textPlainOnly())
 					.decoder(StringDecoder.textPlainOnly()).build();
 			acceptor.setRSocketStrategies(strategies);
 			return acceptor;

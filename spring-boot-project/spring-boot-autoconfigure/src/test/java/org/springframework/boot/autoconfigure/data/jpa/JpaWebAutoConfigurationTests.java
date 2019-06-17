@@ -41,7 +41,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  *
  * @author Dave Syer
  */
-public class JpaWebAutoConfigurationTests {
+class JpaWebAutoConfigurationTests {
 
 	private AnnotationConfigServletWebApplicationContext context;
 
@@ -51,21 +51,16 @@ public class JpaWebAutoConfigurationTests {
 	}
 
 	@Test
-	public void testDefaultRepositoryConfiguration() {
+	void testDefaultRepositoryConfiguration() {
 		this.context = new AnnotationConfigServletWebApplicationContext();
 		this.context.setServletContext(new MockServletContext());
-		this.context.register(TestConfiguration.class,
-				EmbeddedDataSourceConfiguration.class,
-				HibernateJpaAutoConfiguration.class,
-				JpaRepositoriesAutoConfiguration.class,
-				SpringDataWebAutoConfiguration.class,
-				PropertyPlaceholderAutoConfiguration.class);
+		this.context.register(TestConfiguration.class, EmbeddedDataSourceConfiguration.class,
+				HibernateJpaAutoConfiguration.class, JpaRepositoriesAutoConfiguration.class,
+				SpringDataWebAutoConfiguration.class, PropertyPlaceholderAutoConfiguration.class);
 		this.context.refresh();
 		assertThat(this.context.getBean(CityRepository.class)).isNotNull();
-		assertThat(this.context.getBean(PageableHandlerMethodArgumentResolver.class))
-				.isNotNull();
-		assertThat(this.context.getBean(FormattingConversionService.class)
-				.canConvert(Long.class, City.class)).isTrue();
+		assertThat(this.context.getBean(PageableHandlerMethodArgumentResolver.class)).isNotNull();
+		assertThat(this.context.getBean(FormattingConversionService.class).canConvert(Long.class, City.class)).isTrue();
 	}
 
 	@Configuration(proxyBeanMethods = false)
